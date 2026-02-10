@@ -13,6 +13,12 @@
             --accent: #8338ec;
             --text-main: #ffffff;
             --text-dim: #b0b9e0;
+            /* 兼容旧变量名 */
+            --md-primary: var(--primary);
+            --md-on-primary: #000;
+            --md-surface-variant: rgba(26, 31, 58, 0.6);
+            --md-on-surface: var(--text-main);
+            --md-outline: rgba(0,240,255,0.2);
         }
         
         @keyframes glow { 0%, 100% { text-shadow: 0 0 10px rgba(0,240,255,0.5); } 50% { text-shadow: 0 0 20px rgba(0,240,255,0.8); } }
@@ -255,13 +261,15 @@
         if(!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            const data = { name: file.name, type: file.type, size: file.size, data: e.target.result };
+            // 使用 data URL 字符串统一存储（兼容 renderMedia 的字符串处理）
+            const dataUrl = e.target.result; // e.g. data:image/png;base64,...
             if(t==='chat') {
-                DB.addChat({ username: myName, text: '', file: data });
+                DB.addChat({ username: myName, text: '', file: dataUrl });
                 renderChats();
                 document.getElementById('chat-f').value = '';
             } else {
-                window.pendingFile = data;
+                // 将待上传文件保存为 data URL
+                window.pendingFile = dataUrl;
             }
         };
         reader.readAsDataURL(file);
